@@ -58,7 +58,6 @@ export default function Home() {
     <>
       <h1>Waltzing Koala</h1>
       <button onClick={spotifyLogin}>Spotify Login</button>
-      
       {accessToken && <Player accessToken={accessToken} />}
     </>
   );
