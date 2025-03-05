@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Player from '@/app/ui/Player';
+import Microphone from '@/app/ui/Microphone';
 
 export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export default function Home() {
       <h1>Waltzing Koala</h1>
       <button onClick={spotifyLogin}>Spotify Login</button>
       {accessToken && <Player accessToken={accessToken} />}
+      <Microphone />
     </>
   );
 }
