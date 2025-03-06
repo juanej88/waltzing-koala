@@ -43,6 +43,10 @@ const Microphone = () => {
     console.log('Broadcast stopped.');
   };
 
+  const toggleMicrophone = () => {
+    stream ? stopBroadcast() : startBroadcast();
+  };
+
   useEffect(() => {
     // Fetch available audio input devices and the default output device
     let groupId = new Set();
@@ -87,11 +91,8 @@ const Microphone = () => {
       </select>
 
       <div>
-        <button onClick={startBroadcast} disabled={!selectedInput || !!stream}>
-          Start Broadcast
-        </button>
-        <button onClick={stopBroadcast} disabled={!stream}>
-          Stop Broadcast
+        <button onClick={toggleMicrophone}>
+          {!stream ? 'Start Broadcast' : 'Stop Broadcast'}
         </button>
       </div>
     </div>
