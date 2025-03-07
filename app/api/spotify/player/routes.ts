@@ -8,7 +8,7 @@ const path = 'https://api.spotify.com/v1/me/player';
 
 const getHeaders = (accessToken: string) => ({
   Authorization: `Bearer ${accessToken}`,
-  "Content-Type": "application/json",
+  'Content-Type': 'application/json',
 });
 
 const request = async ({endpoint, method, accessToken}: RequestParams) => {

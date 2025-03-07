@@ -7,24 +7,42 @@ const Microphone = () => {
   const [selectedInput, setSelectedInput] = useState<string | null>('null');
   const [outputDevice, setOutputDevice] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
 
   const startBroadcast = async () => {
     if (!selectedInput) return;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: selectedInput ? { exact: selectedInput } : undefined },
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: selectedInput ? { exact: selectedInput } : undefined,
+          echoCancellation: false, // Reduce processing delay
+          noiseSuppression: false, // Avoid unnecessary filtering
+          autoGainControl: false, // Mantain original volume
+        },
       });
 
-      setStream(stream);
+      setStream(newStream);
 
-      // Create an audio element to play the microphone stream
-      const audioElement = new Audio();
-      audioElement.srcObject = stream;
-      audioElement.autoplay = true;
-      audioRef.current = audioElement;
+      // Initialise Web Audio API
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
 
+      const audioContext = audioContextRef.current;
+      const source = audioContext.createMediaStreamSource(newStream);
+      const gainNode = audioContext.createGain(); // Allows volume control
+
+      // Connect microphone input directly to speakers
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Store references
+      sourceRef.current = source;
+      gainNodeRef.current = gainNode;
+      
       console.log('Broadcast started.');
     } catch (error) {
       console.error('Microphone access error:', error);
@@ -36,9 +54,9 @@ const Microphone = () => {
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
     }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.srcObject = null;
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
     }
     console.log('Broadcast stopped.');
   };
@@ -48,7 +66,7 @@ const Microphone = () => {
   };
 
   useEffect(() => {
-    // Fetch available audio input devices and the default output device
+    // Fetch available audio input devices
     let groupId = new Set();
     navigator.mediaDevices.enumerateDevices().then(devices => {
       const mics = devices.filter(device => {
@@ -58,13 +76,13 @@ const Microphone = () => {
         }
       });
       setInputDevices(mics);
-
+      // Default to first microphone
+      if (mics.length > 0) {
+        setSelectedInput(mics[0].deviceId);
+      }
+      // Fetch default audio output
       const speaker = devices.find(device => device.kind === 'audiooutput');
       setOutputDevice(speaker ? speaker.label.split('Default - ').join('') : 'Default System Speaker');
-
-      if (mics.length > 0) {
-        setSelectedInput(mics[0].deviceId); // Default to first microphone
-      }
     }).catch(error => {
       console.log(error(`${error.name}: ${error.message}`));
     });
