@@ -34,6 +34,13 @@ const spotifyPlayer = {
   next: (accessToken: string) => (
     request({endpoint: '/next', method: 'POST', accessToken})
   ),
+  volume: (accessToken: string, volumePercent: number) => (
+    request({
+      endpoint: `/volume?volume_percent=${volumePercent}`,
+      method: 'PUT',
+      accessToken
+    })
+  ),
 };
 
 export default spotifyPlayer;

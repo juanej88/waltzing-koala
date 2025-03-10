@@ -110,7 +110,7 @@ const Microphone = () => {
 
       <div>
         <button onClick={toggleMicrophone}>
-          {!stream ? 'Start Broadcast' : 'Stop Broadcast'}
+          {!stream ? 'Start Talking' : 'Stop Talking'}
         </button>
       </div>
     </div>
