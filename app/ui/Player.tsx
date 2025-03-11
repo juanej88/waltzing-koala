@@ -23,7 +23,7 @@ const Player = ({ accessToken }: { accessToken: string }) => {
     if (response.ok && !isPlaying) setIsPlaying(true);
   };
 
-  const lowerVolume = async (volume: number) => {
+  const adjustVolume = async (volume: number) => {
     await spotifyPlayer.volume(accessToken, volume);
   };
 
@@ -48,7 +48,8 @@ const Player = ({ accessToken }: { accessToken: string }) => {
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <button onClick={() => skipSong('next')}>&gt;&gt;</button>
-      <button onClick={() => lowerVolume(50)}>LowerVolume</button>
+      <button onClick={() => adjustVolume(50)}>LowerVolume</button>
+      <button onClick={() => adjustVolume(100)}>HigherVolume</button>
     </div>
   );
 };

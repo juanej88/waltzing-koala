@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import useSpotifyVolume from '@/app/hooks/useSpotifyVolume';
 
-const Microphone = () => {
+const Microphone = ({ accessToken }: { accessToken: string }) => {
+  const { fadeSpotifyVolume } = useSpotifyVolume(accessToken);
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInput, setSelectedInput] = useState<string | null>('null');
   const [outputDevice, setOutputDevice] = useState<string | null>(null);
@@ -11,7 +13,7 @@ const Microphone = () => {
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
 
-  const startBroadcast = async () => {
+  const startBroadcast = async (type: 'quick' | 'long') => {
     if (!selectedInput) return;
 
     try {
@@ -47,6 +49,14 @@ const Microphone = () => {
     } catch (error) {
       console.error('Microphone access error:', error);
     }
+
+    if (type === 'quick') {
+      const res = await fadeSpotifyVolume(100, 40);
+      console.log(res);
+    } else {
+      const res = await fadeSpotifyVolume(100, 0);
+      console.log(res);
+    }
   };
 
   const stopBroadcast = () => {
@@ -62,7 +72,7 @@ const Microphone = () => {
   };
 
   const toggleMicrophone = () => {
-    stream ? stopBroadcast() : startBroadcast();
+    stream ? stopBroadcast() : startBroadcast('quick');
   };
 
   useEffect(() => {
@@ -107,6 +117,11 @@ const Microphone = () => {
           </option>
         ))}
       </select>
+      
+      <input type='radio' id='quick-announcement' name='announcement' value='quick' />
+      <label htmlFor='quick-announcement'>Quick Announcement</label>
+      <input type='radio' id='long-announcement' name='announcement'  value='long' />
+      <label htmlFor='long-announcement'>Large Announcement</label>
 
       <div>
         <button onClick={toggleMicrophone}>
