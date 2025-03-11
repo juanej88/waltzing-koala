@@ -51,15 +51,15 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
     }
 
     if (type === 'quick') {
-      const res = await fadeSpotifyVolume(100, 40);
+      const res = await fadeSpotifyVolume(100, 40, 2400);
       console.log(res);
     } else {
-      const res = await fadeSpotifyVolume(100, 0);
+      const res = await fadeSpotifyVolume(100, 0, 4000);
       console.log(res);
     }
   };
 
-  const stopBroadcast = () => {
+  const stopBroadcast = async (type: 'quick' | 'long') => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
@@ -69,10 +69,18 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
       audioContextRef.current = null;
     }
     console.log('Broadcast stopped.');
+
+    if (type === 'quick') {
+      const res = await fadeSpotifyVolume(40, 100, 2400);
+      console.log(res);
+    } else {
+      const res = await fadeSpotifyVolume(0, 100, 4000);
+      console.log(res);
+    }
   };
 
   const toggleMicrophone = () => {
-    stream ? stopBroadcast() : startBroadcast('quick');
+    stream ? stopBroadcast('quick') : startBroadcast('quick');
   };
 
   useEffect(() => {
