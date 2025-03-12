@@ -48,7 +48,7 @@ const Player = ({ accessToken }: { accessToken: string }) => {
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <button onClick={() => skipSong('next')}>&gt;&gt;</button>
-      <button onClick={() => adjustVolume(50)}>LowerVolume</button>
+      <button onClick={() => adjustVolume(90)}>LowerVolume</button>
       <button onClick={() => adjustVolume(100)}>HigherVolume</button>
     </div>
   );

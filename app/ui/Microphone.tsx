@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import useSpotifyVolume from '@/app/hooks/useSpotifyVolume';
 
 const Microphone = ({ accessToken }: { accessToken: string }) => {
+  const [announcementType, setAnnouncementType] = useState<'quick' | 'long'>('quick');
   const { fadeSpotifyVolume } = useSpotifyVolume(accessToken);
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInput, setSelectedInput] = useState<string | null>('null');
@@ -80,7 +81,7 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
   };
 
   const toggleMicrophone = () => {
-    stream ? stopBroadcast('quick') : startBroadcast('quick');
+    stream ? stopBroadcast(announcementType) : startBroadcast(announcementType);
   };
 
   useEffect(() => {
@@ -126,9 +127,26 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
         ))}
       </select>
       
-      <input type='radio' id='quick-announcement' name='announcement' value='quick' />
+      <input 
+        type='radio'
+        id='quick-announcement'
+        name='announcement'
+        value='quick'
+        checked={announcementType === 'quick'}
+        onChange={() => setAnnouncementType('quick')}
+        disabled={!!stream}
+      />
       <label htmlFor='quick-announcement'>Quick Announcement</label>
-      <input type='radio' id='long-announcement' name='announcement'  value='long' />
+
+      <input
+        type='radio'
+        id='long-announcement'
+        name='announcement' 
+        value='long'
+        checked={announcementType === 'long'}
+        onChange={() => setAnnouncementType('long')}
+        disabled={!!stream}
+      />
       <label htmlFor='long-announcement'>Large Announcement</label>
 
       <div>
