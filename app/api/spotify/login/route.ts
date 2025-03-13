@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const scope = 'user-read-private user-read-email user-read-playback-state user-modify-playback-state streaming';
 
   if (!clientId || !clientSecret || !redirectUri) {
-    return new Response(JSON.stringify({ error: "Missing environment variables" }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Missing environment variables' }), { status: 500 });
   }
 
   const url = new URL(req.url);
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
   const tokenData = await tokenResponse.json();
 
   if (!tokenResponse.ok) {
-    return new Response(JSON.stringify({ error: "Failed to get access token", details: tokenData }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Failed to get access token', details: tokenData }), { status: 400 });
   }
 
   return new Response(JSON.stringify(tokenData), { status: 200 });
