@@ -9,7 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setAccessToken(localStorage.getItem('spotify_token'));
+      setAccessToken(localStorage.getItem('spotify_access_token'));
     }
   }, []);
   
@@ -36,7 +36,14 @@ export default function Home() {
       if (data.access_token) {
         console.log(data);
         setAccessToken(data.access_token);
-        localStorage.setItem('spotify_token', data.access_token); // Store token for later use
+        const expirationTime = Date.now() + (Number(data.expires_in) * 1000);
+        const expirationDate = new Date(expirationTime).toLocaleString();
+
+        // Store tokens and expiration date
+        localStorage.setItem('spotify_access_token', data.access_token);
+        localStorage.setItem('spotify_refresh_token', data.refresh_token);
+        localStorage.setItem('spotify_expiration_date', expirationDate);
+        
         window.history.replaceState({}, document.title, "/"); // Clean URL
       } else {
         console.error("Failed to retrieve access token", data);

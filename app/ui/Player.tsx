@@ -28,14 +28,39 @@ const Player = ({ accessToken }: { accessToken: string }) => {
   };
 
   const getSpotifyState = async () => {
-    const response = await spotifyPlayer.getState(accessToken);
-    return await response.json();
+    try {
+      const response = await spotifyPlayer.getState(accessToken);
+
+      if (!response.ok) {
+        throw new Error(`Spotify API error: ${response.status}`);
+      }
+
+      const data = await response.json().catch(() => null);
+      if (!data) {
+        console.warn('Empty response received.');
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`Error fetching Spotify state: ${error}`);
+    }
   };
 
   useEffect(() => {
     const setUpSpotifyState = async () => {
-      const spotifyState = await getSpotifyState();
-      setIsPlaying(spotifyState.is_playing);
+      try {
+        const spotifyState = await getSpotifyState();
+
+        if (!spotifyState) {
+          console.warn('There is no Spotify player active. Play Spotify in your prefered device');
+          return;
+        }
+
+        setIsPlaying(spotifyState.is_playing);
+      } catch (error) {
+        console.error(`Error at setting isPlaying: ${error}`);
+      }
     };
 
     setUpSpotifyState();
