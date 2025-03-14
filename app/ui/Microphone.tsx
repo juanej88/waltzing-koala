@@ -111,7 +111,6 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
     <div>
       <h2>Microphone</h2>
 
-      <p><small>Change the output manually in your system settings.</small></p>
       <p>Output: {outputDevice || 'Detecting...'}</p>
 
       <label htmlFor='mic-select'>Select Microphone:</label>
@@ -127,27 +126,29 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
         ))}
       </select>
       
-      <input 
-        type='radio'
-        id='quick-announcement'
-        name='announcement'
-        value='quick'
-        checked={announcementType === 'quick'}
-        onChange={() => setAnnouncementType('quick')}
-        disabled={!!stream}
-      />
-      <label htmlFor='quick-announcement'>Quick Announcement</label>
+      <div>
+        <input 
+          type='radio'
+          id='quick-announcement'
+          name='announcement'
+          value='quick'
+          checked={announcementType === 'quick'}
+          onChange={() => setAnnouncementType('quick')}
+          disabled={!!stream}
+        />
+        <label htmlFor='quick-announcement'>Quick Announcement</label>
 
-      <input
-        type='radio'
-        id='long-announcement'
-        name='announcement' 
-        value='long'
-        checked={announcementType === 'long'}
-        onChange={() => setAnnouncementType('long')}
-        disabled={!!stream}
-      />
-      <label htmlFor='long-announcement'>Large Announcement</label>
+        <input
+          type='radio'
+          id='long-announcement'
+          name='announcement' 
+          value='long'
+          checked={announcementType === 'long'}
+          onChange={() => setAnnouncementType('long')}
+          disabled={!!stream}
+          />
+        <label htmlFor='long-announcement'>Large Announcement</label>
+      </div>
 
       <div>
         <button onClick={toggleMicrophone}>
