@@ -147,7 +147,7 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
           onChange={() => setAnnouncementType('long')}
           disabled={!!stream}
           />
-        <label htmlFor='long-announcement'>Large Announcement</label>
+        <label htmlFor='long-announcement'>Long Announcement</label>
       </div>
 
       <div>

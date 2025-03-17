@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import spotifyPlayer from '@/app/api/spotify/player/routes';
+import useSpotifyVolume from '@/app/hooks/useSpotifyVolume';
 import Image from 'next/image';
 
 interface CurrentTrack {
@@ -14,17 +15,38 @@ interface CurrentTrack {
 }
 
 const Player = ({ accessToken }: { accessToken: string }) => {
+  const { fadeSpotifyVolume } = useSpotifyVolume(accessToken);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTrack, setCurrentTrack] = useState<CurrentTrack | null>(null);
-  const [refreshState, setRefreshState] = useState(true);
+  const [refreshState, setRefreshState] = useState<boolean>(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const announcements = [
+    {
+      id: '3QHMxEOAGD51PDlbFPHLyJ',
+      audio: '/audio/DJI_05_20250314_230518.WAV',
+      played: false,
+    },
+    {
+      id: '1iHDQ530nvzDVCjWVftfdQ',
+      audio: '/audio/Slovak_Sokoly.mp3',
+      played: false,
+    },
+  ]
 
   const togglePlay = async () => {
     if (isPlaying) {
       const response = await spotifyPlayer.pause(accessToken);
-      if (response.ok) setIsPlaying(false);
+      if (response.ok) {
+        setIsPlaying(false);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      }
     } else {
       const response = await spotifyPlayer.play(accessToken);
-      if (response.ok) setIsPlaying(true);
+      if (response.ok) {
+        setIsPlaying(true);
+        setRefreshState(true);
+      }
     }
   };
 
@@ -32,8 +54,11 @@ const Player = ({ accessToken }: { accessToken: string }) => {
     const response = action === 'previous' ?
     await spotifyPlayer.previous(accessToken) :
     await spotifyPlayer.next(accessToken);
-    if (response.ok && !isPlaying) setIsPlaying(true);
-    if (response.ok) setRefreshState(true);
+
+    if (response.ok) {
+      if (!isPlaying) setIsPlaying(true);
+      setRefreshState(true);
+    }
   };
 
   const adjustVolume = async (volume: number) => {
@@ -71,8 +96,6 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           return;
         }
 
-        setIsPlaying(spotifyState.is_playing);
-
         const newTrack = {
           id: spotifyState.item.id,
           image_url: spotifyState.item.album.images[1].url,
@@ -82,19 +105,29 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           progress_ms: spotifyState.progress_ms,
         };
 
-        setCurrentTrack(newTrack);
+        console.log(spotifyState.item.id);
 
-        // This avoids the calling of checkSpotifyState after the spotifyState is updated
-        setRefreshState(false);
+        const matchingAnnouncement = announcements.find(ann => ann.id == newTrack.id);
+        if (matchingAnnouncement) {
+          await spotifyPlayer.volume(accessToken, 40);
+          await spotifyPlayer.pause(accessToken);
+          const audio = new Audio(matchingAnnouncement.audio);
+          audio.volume = 1.0;
+          audio.play()
+          .then(() => {
+              audio.addEventListener('ended', async () => {
+                await spotifyPlayer.play(accessToken);
+                await fadeSpotifyVolume(40, 100, 1000);
+              })
+            })
+            .catch(err => console.error('Error playing announcement:', err));
+        }
 
-        const remainingTime = newTrack.length_ms - newTrack.progress_ms - 11000;
-        console.log(`Next update in: ${remainingTime}ms`);
-
-        const timeoutId = setTimeout(() => {
-          setRefreshState(true);
-        }, remainingTime);
-
-        return () => clearTimeout(timeoutId);
+        if (spotifyState) {
+          setIsPlaying(spotifyState.is_playing);
+          setCurrentTrack(newTrack);
+          setRefreshState(false);
+        }
 
       } catch (error) {
         console.error(`Error updating playback state: ${error}`);
@@ -105,6 +138,28 @@ const Player = ({ accessToken }: { accessToken: string }) => {
 
   }, [refreshState]);
 
+  useEffect(() => {
+    if (!currentTrack) return;
+
+    // Clear any existing timeout
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
+    console.log(`Setting new timeout for track ${currentTrack.song}`);
+
+    // Set new timeout with 10s of crossfade
+    const remainingTime = currentTrack.length_ms - currentTrack.progress_ms - 10000;
+    console.log(`Next update in: ${Math.floor(remainingTime / 1000)}s`);
+    timeoutRef.current = setTimeout(() => {
+      console.log('Refreshing Spotify state due to timeout');
+      setRefreshState(true);
+    }, Math.max(remainingTime, 1000));
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
+  }, [currentTrack]);
+  
+
   return (
     <>
       <section className='flex items-center gap-8'>
@@ -113,7 +168,7 @@ const Player = ({ accessToken }: { accessToken: string }) => {
               <Image src={currentTrack.image_url} height={64} width={64} className='w-auto h-auto' alt={`Album Image for the song ${currentTrack.song}`} />
             <div>
               <h3 className='max-w-[192px] overflow-hidden text-ellipsis whitespace-nowrap'>{currentTrack.song}</h3>
-              <p>{currentTrack.artist}</p>
+              <p className='max-w-[192px] overflow-hidden text-ellipsis whitespace-nowrap'>{currentTrack.artist}</p>
             </div>
           </article>
         }
@@ -127,10 +182,9 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       </section>
       
       <div>
-        <button onClick={() => adjustVolume(90)}>LowerVolume</button>
+        <button onClick={() => adjustVolume(40)}>LowerVolume</button>
         <button onClick={() => adjustVolume(100)}>HigherVolume</button>
       </div>
-      <audio src='/audio/Nova_tts-1_1x_2025-03-14T03_12_09-597Z.mp3' controls></audio>
     </>
   );
 };
