@@ -19,7 +19,9 @@ const Player = ({ accessToken }: { accessToken: string }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTrack, setCurrentTrack] = useState<CurrentTrack | null>(null);
   const [refreshState, setRefreshState] = useState<boolean>(true);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+  const timeoutStateRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutAnnouncementRef = useRef<NodeJS.Timeout | null>(null);
 
   const announcements = [
     {
@@ -28,8 +30,13 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       played: false,
     },
     {
-      id: '1iHDQ530nvzDVCjWVftfdQ',
+      id: '3PZr5WynZK8B1UGBQng3So',
       audio: '/audio/Slovak_Sokoly.mp3',
+      played: false,
+    },
+    {
+      id: '6TZyCj5SPydjC0Zn8dQzo9',
+      audio: '/audio/caballo_dorado.mp3',
       played: false,
     },
   ]
@@ -39,7 +46,8 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       const response = await spotifyPlayer.pause(accessToken);
       if (response.ok) {
         setIsPlaying(false);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        if (timeoutStateRef.current) clearTimeout(timeoutStateRef.current);
+        if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
       }
     } else {
       const response = await spotifyPlayer.play(accessToken);
@@ -84,6 +92,26 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       console.error(`Error fetching Spotify state: ${error}`);
     }
   };
+  
+  const getSpotifyQueue = async () => {
+    try {
+      const response = await spotifyPlayer.getQueue(accessToken);
+
+      if (!response.ok) {
+        throw new Error(`Spotify API error: ${response.status}`);
+      }
+
+      const data = await response.json().catch(() => null);
+      if (!data) {
+        console.warn('Empty response received.');
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`Error fetching Spotify state: ${error}`);
+    }
+  };
 
   useEffect(() => {
     if (!refreshState) return;
@@ -91,6 +119,7 @@ const Player = ({ accessToken }: { accessToken: string }) => {
     const checkSpotifyState = async () => {
       try {
         const spotifyState = await getSpotifyState();
+        const spotifyQueue = await getSpotifyQueue();
         if (!spotifyState) {
           console.warn('There is no Spotify player active. Play Spotify in your prefered device');
           return;
@@ -105,22 +134,31 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           progress_ms: spotifyState.progress_ms,
         };
 
-        console.log(spotifyState.item.id);
+        const nextTrack = {
+          id: spotifyQueue.queue[0].id,
+          artist: spotifyQueue.queue[0].artists[0].name,
+          song: spotifyQueue.queue[0].name,
+          length_ms: spotifyQueue.queue[0].duration_ms,
+        }
 
-        const matchingAnnouncement = announcements.find(ann => ann.id == newTrack.id);
+        console.log(spotifyState.item.id);
+        console.log(nextTrack);
+
+        const matchingAnnouncement = announcements.find(ann => ann.id == nextTrack.id);
         if (matchingAnnouncement) {
-          await spotifyPlayer.volume(accessToken, 40);
-          await spotifyPlayer.pause(accessToken);
-          const audio = new Audio(matchingAnnouncement.audio);
-          audio.volume = 1.0;
-          audio.play()
-          .then(() => {
-              audio.addEventListener('ended', async () => {
-                await spotifyPlayer.play(accessToken);
-                await fadeSpotifyVolume(40, 100, 1000);
-              })
-            })
-            .catch(err => console.error('Error playing announcement:', err));
+          setAnnouncement(matchingAnnouncement.audio);
+          // await spotifyPlayer.volume(accessToken, 40);
+          // await spotifyPlayer.pause(accessToken);
+          // const audio = new Audio(matchingAnnouncement.audio);
+          // audio.volume = 1.0;
+          // audio.play()
+          // .then(() => {
+          //     audio.addEventListener('ended', async () => {
+          //       await spotifyPlayer.play(accessToken);
+          //       await fadeSpotifyVolume(40, 100, 1000);
+          //     })
+          //   })
+          //   .catch(err => console.error('Error playing announcement:', err));
         }
 
         if (spotifyState) {
@@ -142,22 +180,89 @@ const Player = ({ accessToken }: { accessToken: string }) => {
     if (!currentTrack) return;
 
     // Clear any existing timeout
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (timeoutStateRef.current) clearTimeout(timeoutStateRef.current);
+    if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
     
     console.log(`Setting new timeout for track ${currentTrack.song}`);
 
     // Set new timeout with 10s of crossfade
     const remainingTime = currentTrack.length_ms - currentTrack.progress_ms - 10000;
     console.log(`Next update in: ${Math.floor(remainingTime / 1000)}s`);
-    timeoutRef.current = setTimeout(() => {
+    timeoutStateRef.current = setTimeout(() => {
       console.log('Refreshing Spotify state due to timeout');
       setRefreshState(true);
     }, Math.max(remainingTime, 1000));
 
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (timeoutStateRef.current) clearTimeout(timeoutStateRef.current);
+      if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
     }
   }, [currentTrack]);
+
+  const getAudioDuration = (audioSrc: string): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio(audioSrc);
+      audio.addEventListener('loadedmetadata', () => {
+        resolve(audio.duration);
+      });
+
+
+      audio.addEventListener('error', error => {
+        reject(`Error loading audio: ${error}`);
+      });
+    });
+  };
+  
+  useEffect(() => {
+    if (!announcement || !currentTrack) return;
+
+    const setAnnouncementTimeout = async () => {
+      // Clear any existing timeout
+      if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
+      
+      console.log(`Setting new timeout for announcement ${announcement}`);
+      
+      const audioLength = await getAudioDuration(announcement) * 1000;
+      
+      const announcement_ms = currentTrack.length_ms - currentTrack.progress_ms - 10000 - 4000 - audioLength;
+      
+      console.log(`Next announcement in: ${Math.floor(announcement_ms / 1000)}s`);
+
+      const playAnnouncement = async () => {
+        console.log('Playing announcement');
+
+        try {
+          // await spotifyPlayer.volume(accessToken, 40);
+          await fadeSpotifyVolume(100, 40, 1000);
+          // await spotifyPlayer.pause(accessToken);
+
+          const audio = new Audio(announcement);
+          audio.volume = 1.0;
+          await audio.play();
+
+          audio.addEventListener('ended', async () => {
+            console.log('Announcement ended');
+            // await spotifyPlayer.play(accessToken);
+            await fadeSpotifyVolume(40, 100, 1000);
+          });
+        } catch (error) {
+          console.error('Error playing announcement:', error);
+        }
+      };
+
+      // Set new timeout
+      timeoutAnnouncementRef.current = setTimeout(() => {
+        playAnnouncement();
+        setAnnouncement(null);
+      }, Math.max(announcement_ms, 1000));
+    }
+
+    setAnnouncementTimeout();
+
+    return () => {
+      if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
+    };
+  }, [announcement, currentTrack]);
   
 
   return (

@@ -22,6 +22,9 @@ const spotifyPlayer = {
   getState: (accessToken: string) => (
     request({endpoint: '', method: 'GET', accessToken})
   ),
+  getQueue: (accessToken: string) => (
+    request({endpoint: '/queue', method: 'GET', accessToken})
+  ),
   play: (accessToken: string) => (
     request({endpoint: '/play', method: 'PUT', accessToken})
   ),
