@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import spotifyPlayer from '@/app/api/spotify/player/routes';
 import useSpotifyVolume from '@/app/hooks/useSpotifyVolume';
+import announcements from '@/app/utils/announcements';
 import Image from 'next/image';
 
 interface CurrentTrack {
@@ -22,24 +23,6 @@ const Player = ({ accessToken }: { accessToken: string }) => {
   const [announcement, setAnnouncement] = useState<string | null>(null);
   const timeoutStateRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutAnnouncementRef = useRef<NodeJS.Timeout | null>(null);
-
-  const announcements = [
-    {
-      id: '3QHMxEOAGD51PDlbFPHLyJ',
-      audio: '/audio/DJI_05_20250314_230518.WAV',
-      played: false,
-    },
-    {
-      id: '3PZr5WynZK8B1UGBQng3So',
-      audio: '/audio/Slovak_Sokoly.mp3',
-      played: false,
-    },
-    {
-      id: '6TZyCj5SPydjC0Zn8dQzo9',
-      audio: '/audio/caballo_dorado.mp3',
-      played: false,
-    },
-  ]
 
   const togglePlay = async () => {
     if (isPlaying) {
@@ -147,18 +130,6 @@ const Player = ({ accessToken }: { accessToken: string }) => {
         const matchingAnnouncement = announcements.find(ann => ann.id == nextTrack.id);
         if (matchingAnnouncement) {
           setAnnouncement(matchingAnnouncement.audio);
-          // await spotifyPlayer.volume(accessToken, 40);
-          // await spotifyPlayer.pause(accessToken);
-          // const audio = new Audio(matchingAnnouncement.audio);
-          // audio.volume = 1.0;
-          // audio.play()
-          // .then(() => {
-          //     audio.addEventListener('ended', async () => {
-          //       await spotifyPlayer.play(accessToken);
-          //       await fadeSpotifyVolume(40, 100, 1000);
-          //     })
-          //   })
-          //   .catch(err => console.error('Error playing announcement:', err));
         }
 
         if (spotifyState) {
