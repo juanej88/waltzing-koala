@@ -52,7 +52,7 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
     }
 
     if (type === 'quick') {
-      const res = await fadeSpotifyVolume(100, 40, 2400);
+      const res = await fadeSpotifyVolume(100, 50, 2000);
       console.log(res);
     } else {
       const res = await fadeSpotifyVolume(100, 0, 4000);
@@ -72,7 +72,7 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
     console.log('Broadcast stopped.');
 
     if (type === 'quick') {
-      const res = await fadeSpotifyVolume(40, 100, 2400);
+      const res = await fadeSpotifyVolume(50, 100, 2000);
       console.log(res);
     } else {
       const res = await fadeSpotifyVolume(0, 100, 4000);
@@ -126,35 +126,41 @@ const Microphone = ({ accessToken }: { accessToken: string }) => {
         ))}
       </select>
       
-      <div>
-        <input 
-          type='radio'
-          id='quick-announcement'
-          name='announcement'
-          value='quick'
-          checked={announcementType === 'quick'}
-          onChange={() => setAnnouncementType('quick')}
-          disabled={!!stream}
-        />
-        <label htmlFor='quick-announcement'>Quick Announcement</label>
-
-        <input
-          type='radio'
-          id='long-announcement'
-          name='announcement' 
-          value='long'
-          checked={announcementType === 'long'}
-          onChange={() => setAnnouncementType('long')}
-          disabled={!!stream}
+      <section className='flex-center my-4 gap-6'>
+        <div>
+          <input
+            type='radio'
+            id='quick-announcement'
+            name='announcement'
+            value='quick'
+            checked={announcementType === 'quick'}
+            onChange={() => setAnnouncementType('quick')}
+            disabled={!!stream}
+            className='cursor-pointer'
           />
-        <label htmlFor='long-announcement'>Long Announcement</label>
-      </div>
+          <label htmlFor='quick-announcement' className='pl-1 cursor-pointer'>Quick Announcement</label>
+        </div>
 
-      <div>
-        <button onClick={toggleMicrophone}>
+        <div className='cursor-pointer'>
+          <input
+            type='radio'
+            id='long-announcement'
+            name='announcement' 
+            value='long'
+            checked={announcementType === 'long'}
+            onChange={() => setAnnouncementType('long')}
+            disabled={!!stream}
+            className='cursor-pointer'
+            />
+          <label htmlFor='long-announcement' className='pl-1 cursor-pointer'>Long Announcement</label>
+        </div>
+      </section>
+
+      <section className='flex-center my-4'>
+        <button onClick={toggleMicrophone} className='flex-center primary-btn p-1 text-secondary'>
           {!stream ? 'Start Talking' : 'Stop Talking'}
         </button>
-      </div>
+      </section>
     </div>
   );
 };

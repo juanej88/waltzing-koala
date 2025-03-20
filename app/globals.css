@@ -11,6 +11,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --secondary: hsla(0, 0%, 70%, 100%);
   }
 }
 
@@ -18,4 +19,14 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .primary-btn {
+    @apply rounded-md hover:text-foreground transition-colors hover:bg-gray-500/10 active:bg-gray-500/15;
+  }
 }

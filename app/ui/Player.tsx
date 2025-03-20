@@ -203,8 +203,8 @@ const Player = ({ accessToken }: { accessToken: string }) => {
         console.log('Playing announcement');
 
         try {
-          // await spotifyPlayer.volume(accessToken, 40);
-          await fadeSpotifyVolume(100, 40, 1000);
+          // await spotifyPlayer.volume(accessToken, 50);
+          await fadeSpotifyVolume(100, 50, 1000);
           // await spotifyPlayer.pause(accessToken);
 
           const audio = new Audio(announcement);
@@ -214,7 +214,7 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           audio.addEventListener('ended', async () => {
             console.log('Announcement ended');
             // await spotifyPlayer.play(accessToken);
-            await fadeSpotifyVolume(40, 100, 1000);
+            await fadeSpotifyVolume(50, 100, 1000);
           });
         } catch (error) {
           console.error('Error playing announcement:', error);

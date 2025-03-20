@@ -2,7 +2,7 @@ import spotifyPlayer from '@/app/api/spotify/player/routes';
 
 const useSpotifyVolume = (accessToken: string) => {
   const fadeSpotifyVolume = async (startVolume: number, endVolume: number, duration: number) => {
-    const steps = duration === 4000 ? 10 : 6;
+    const steps = duration === 4000 ? 10 : 5;
     const stepDuration = duration / steps;
     let newVolume = startVolume;
 
