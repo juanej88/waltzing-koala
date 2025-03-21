@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Player from '@/app/ui/Player';
 import Microphone from '@/app/ui/Microphone';
+import { cinzel_decorative } from './ui/fonts';
 
 export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -115,7 +116,7 @@ export default function Home() {
   
   return (
     <>
-      <h1>Waltzing Koala</h1>
+      <h1 className={`${cinzel_decorative.className} antialiased`}>Waltzing Koala</h1>
       <button onClick={spotifyLogin}>Spotify Login</button>
       {accessToken && <Player accessToken={accessToken} />}
       {accessToken && <Microphone accessToken={accessToken} />}
