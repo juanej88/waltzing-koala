@@ -234,8 +234,23 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       if (timeoutAnnouncementRef.current) clearTimeout(timeoutAnnouncementRef.current);
     };
   }, [announcement, currentTrack]);
-  
 
+  const lowerVolume = async () => {
+    try {
+      await fadeSpotifyVolume(100, 50, 1000);
+    } catch (error) {
+      console.error('Error lower volume:', error);
+    }
+  }
+
+  const higherVolume = async () => {
+    try {
+      await fadeSpotifyVolume(50, 100, 1000);
+    } catch (error) {
+      console.error('Error lower volume:', error);
+    }
+  }
+  
   return (
     <>
       <section className='flex items-center gap-8'>
@@ -258,8 +273,8 @@ const Player = ({ accessToken }: { accessToken: string }) => {
       </section>
       
       <div>
-        <button onClick={() => adjustVolume(40)}>LowerVolume</button>
-        <button onClick={() => adjustVolume(100)}>HigherVolume</button>
+        <button onClick={lowerVolume} className='primary-btn p-1 text-secondary'>Lower Volume</button>
+        <button onClick={higherVolume} className='primary-btn p-1 text-secondary'>Higher Volume</button>
       </div>
     </>
   );
