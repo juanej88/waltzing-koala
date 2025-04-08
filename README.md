@@ -32,3 +32,15 @@ This project was initially built for a wedding event, focusing on core functiona
 - Improved UI/UX design with styled components
 - Cloud storage integration for storing audio files
 - Advanced scheduling and automation of announcements
+
+## How It Works
+1. Connect your Spotify account.
+2. Choose between a pre-recorded announcement, a ChatGPT TTS-generated announcement, or a live microphone announcement.
+3. When an announcement plays:
+  - Music fades out (quick fade for short announcements, long fade for extended messages).
+  - For pre-recorded messages, background music remains at a lower volume.
+  - Once the announcement ends, the playlist resumes from the next track.
+4. Enjoy seamless music and announcements without needing a DJ or MC.
+
+## Why "Waltzing Koala"?
+This project was built for a wedding where no DJ or MC was present, ensuring smooth announcements without interrupting the event's flow. The name "Waltzing Koala" reflects the elegant and unexpected charm it brings—just like a koala waltzing!
