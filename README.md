@@ -44,3 +44,19 @@ This project was initially built for a wedding event, focusing on core functiona
 
 ## Why "Waltzing Koala"?
 This project was built for a wedding where no DJ or MC was present, ensuring smooth announcements without interrupting the event's flow. The name "Waltzing Koala" reflects the elegant and unexpected charm it brings—just like a koala waltzing!
+
+## Installation & Setup (Coming Soon)
+
+Since the backend is not yet implemented, the frontend can be run locally with:
+
+```sh
+npm install
+npm run dev
+```
+
+Stay tuned for backend implementation and further refinements!
+
+---
+
+### Author
+[Juan Espinosa Jorrin](https://juanespinosa.net)
