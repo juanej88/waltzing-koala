@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 import spotifyPlayer from '@/app/api/spotify/player/routes';
 import useSpotifyVolume from '@/app/hooks/useSpotifyVolume';
 import announcements from '@/app/utils/announcements';
@@ -264,11 +265,11 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           </article>
         }
         <article>
-          <button onClick={() => skipSong('previous')}>&lt;&lt;</button>
+          <button onClick={() => skipSong('previous')}><SkipBack fill='currentColor' /></button>
           <button onClick={togglePlay}>
-            {isPlaying ? 'Pause' : 'Play'}
+            {isPlaying ? <Pause fill='currentColor' /> : <Play fill='currentColor' />}
           </button>
-          <button onClick={() => skipSong('next')}>&gt;&gt;</button>
+          <button onClick={() => skipSong('next')}><SkipForward fill='currentColor' /></button>
         </article>
       </section>
       
