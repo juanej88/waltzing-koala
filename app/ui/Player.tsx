@@ -265,17 +265,28 @@ const Player = ({ accessToken }: { accessToken: string }) => {
           </article>
         }
         <article>
-          <button onClick={() => skipSong('previous')}><SkipBack fill='currentColor' /></button>
+          <button onClick={() => skipSong('previous')}>
+            <SkipBack size={28} fill='currentColor' strokeWidth={0.75} className='primary-btn p-1' />
+            </button>
           <button onClick={togglePlay}>
-            {isPlaying ? <Pause fill='currentColor' /> : <Play fill='currentColor' />}
+            {isPlaying ? 
+              <Pause size={28} fill='currentColor' strokeWidth={0.75} className='primary-btn p-1' /> :
+              <Play size={28} fill='currentColor' strokeWidth={0.75} className='primary-btn p-1' />
+            }
           </button>
-          <button onClick={() => skipSong('next')}><SkipForward fill='currentColor' /></button>
+          <button onClick={() => skipSong('next')}>
+            <SkipForward size={28} fill='currentColor' strokeWidth={0.75} className='primary-btn p-1' />
+          </button>
         </article>
       </section>
       
       <div>
-        <button onClick={lowerVolume} className='primary-btn p-1 text-secondary'>Lower Volume</button>
-        <button onClick={higherVolume} className='primary-btn p-1 text-secondary'>Higher Volume</button>
+        <button onClick={lowerVolume} className='primary-btn p-1'>
+          Lower Volume
+        </button>
+        <button onClick={higherVolume} className='primary-btn p-1'>
+          Higher Volume
+        </button>
       </div>
     </>
   );
