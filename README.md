@@ -1,6 +1,6 @@
 # Waltzing Koala
 
-Waltzing Koala is an announcement and music management app designed to seamlessly blend announcements into a Spotify playlist. Users can pre-record announcements, generate them using ChatGPT's text-to-speech (TTS) capabilities, or make live announcements using a microphone. The app ensures a smooth transition between announcements and music by integrating with the Spotify Web API to control playback and volume fading.
+Waltzing Koala is a personal wedding project turned tech showcase. It’s an announcement and music management app designed to blend special moments into Spotify playlists without needing a DJ or MC. Whether it’s a heartfelt toast, a fun story, or a schedule update, announcements play smoothly alongside music using pre-recorded audio, ChatGPT's text-to-speech, or live mic input. The app integrates with the Spotify Web API for playback control and elegant volume fading.
 
 ## Features
 
@@ -25,7 +25,7 @@ Waltzing Koala is an announcement and music management app designed to seamlessl
 - **ChatGPT API** (for TTS-generated announcements)
 
 ## Project Status
-This project was initially built for a wedding event, focusing on core functionality rather than styling. The backend is currently hardcoded but will be refactored using Django REST Framework and MySQL for scalability. Future updates will include:
+This project was created for my wedding in March 2025, where I wanted a custom solution for music and announcements without relying on a DJ or MC. The frontend is fully functional, and the backend is currently hardcoded but will be refactored with Django REST Framework and MySQL. Future updates will include:
 
 - Full backend implementation with Django
 - User authentication and settings for personalised announcements
@@ -43,7 +43,7 @@ This project was initially built for a wedding event, focusing on core functiona
 4. Enjoy seamless music and announcements without needing a DJ or MC.
 
 ## Why "Waltzing Koala"?
-This project was built for a wedding where no DJ or MC was present, ensuring smooth announcements without interrupting the event's flow. The name "Waltzing Koala" reflects the elegant and unexpected charm it brings—just like a koala waltzing!
+Waltzing Koala was created for my own wedding, during a time when my wife and I were on a tight budget, but I didn’t want to lose the heart and soul that a DJ or MC brings to a celebration. I needed a creative, meaningful solution to handle announcements, storytelling, and music transitions with both elegance and personality. The name reflects that spirit: something charming, unexpected, and uniquely delightful, just like a koala waltzing.
 
 ## Installation & Setup (Coming Soon)
 
